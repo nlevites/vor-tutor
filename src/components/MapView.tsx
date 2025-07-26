@@ -11,8 +11,14 @@ const MapView: React.FC = () => {
     lng: aircraft.longitude
   });
 
+  // Add flag to prevent auto-recentering when user manually places aircraft
+  const [manualPlacementMode, setManualPlacementMode] = useState(false);
+
   // Center map on aircraft when simulation starts or aircraft position changes significantly
   useEffect(() => {
+    // Don't auto-recenter if in manual placement mode
+    if (manualPlacementMode) return;
+
     const distance = Math.sqrt(
       Math.pow(aircraft.latitude - mapCenter.lat, 2) + 
       Math.pow(aircraft.longitude - mapCenter.lng, 2)
@@ -25,10 +31,10 @@ const MapView: React.FC = () => {
         lng: aircraft.longitude
       });
     }
-  }, [aircraft.latitude, aircraft.longitude]);
+  }, [aircraft.latitude, aircraft.longitude, manualPlacementMode]);
 
-  const mapWidth = 400;
-  const mapHeight = 280;
+  const mapWidth = 480;
+  const mapHeight = 380;
   const scale = 1200; // Pixels per degree
   
   // Edge threshold - how close to edge before recentering (in pixels)
@@ -65,11 +71,24 @@ const MapView: React.FC = () => {
     const clickY = event.clientY - rect.top;
     
     const newPosition = screenToLatLng(clickX, clickY);
+    
+    // Enable manual placement mode temporarily
+    setManualPlacementMode(true);
+    
+    // Update aircraft position
     updateAircraftPosition(newPosition.lat, newPosition.lng);
+    
+    // Clear manual placement mode after a short delay to allow auto-recentering to resume
+    setTimeout(() => {
+      setManualPlacementMode(false);
+    }, 1000);
   };
 
   // Smooth auto-centering with animation
   useEffect(() => {
+    // Don't auto-recenter if in manual placement mode
+    if (manualPlacementMode) return;
+
     const aircraftPos = projectPosition(aircraft.latitude, aircraft.longitude);
     
     // Check if aircraft is near any edge
@@ -96,17 +115,18 @@ const MapView: React.FC = () => {
         });
       }
     }
-  }, [aircraft.latitude, aircraft.longitude, mapCenter.lat, mapCenter.lng]);
+  }, [aircraft.latitude, aircraft.longitude, mapCenter.lat, mapCenter.lng, manualPlacementMode]);
 
   const aircraftPos = projectPosition(aircraft.latitude, aircraft.longitude);
   const selectedStation = stations.find(s => s.frequency === vorReceiver.frequency);
 
   // Calculate if recentering is happening
-  const isRecentering = 
+  const isRecentering = !manualPlacementMode && (
     aircraftPos.x < edgeThreshold || 
     aircraftPos.x > mapWidth - edgeThreshold ||
     aircraftPos.y < edgeThreshold || 
-    aircraftPos.y > mapHeight - edgeThreshold;
+    aircraftPos.y > mapHeight - edgeThreshold
+  );
 
   return (
     <div className="aviation-panel">
@@ -286,14 +306,7 @@ const MapView: React.FC = () => {
           <Plane size={20} />
         </div>
 
-        {/* Distance and bearing info for selected station */}
-        {selectedStation && vorReceiver.stationInRange && (
-          <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white text-xs p-2 rounded pointer-events-none">
-            <div>Distance: {vorReceiver.distance.toFixed(1)} nm</div>
-            <div>Current Radial: {vorReceiver.radial.toString().padStart(3, '0')}°</div>
-            <div>OBS Setting: {vorReceiver.obs.toString().padStart(3, '0')}°</div>
-          </div>
-        )}
+
 
         {/* Recentering indicator */}
         {isRecentering && (

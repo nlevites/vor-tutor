@@ -5,11 +5,11 @@ import { useVORStore } from '../store/vorStore';
 const VORInstrument: React.FC = () => {
   const { vorReceiver, setOBS } = useVORStore();
   
-  // Track the actual rotation for smooth animation across 360°/0° boundary
-  const [displayRotation, setDisplayRotation] = useState(0);
+  // Track the visual rotation for smooth animation across 360°/0° boundary
+  const [visualRotation, setVisualRotation] = useState(vorReceiver.obs);
   const lastOBSRef = useRef(vorReceiver.obs);
   
-  // Calculate smooth rotation that doesn't spin backwards
+  // Update visual rotation smoothly when OBS changes
   React.useEffect(() => {
     const currentOBS = vorReceiver.obs;
     const lastOBS = lastOBSRef.current;
@@ -23,7 +23,8 @@ const VORInstrument: React.FC = () => {
       rotationDelta += 360;
     }
     
-    setDisplayRotation(prev => prev + rotationDelta);
+    // Update visual rotation by adding the delta
+    setVisualRotation(prev => prev + rotationDelta);
     lastOBSRef.current = currentOBS;
   }, [vorReceiver.obs]);
   
@@ -85,10 +86,10 @@ const VORInstrument: React.FC = () => {
           })}
           
           {/* Cardinal direction labels */}
-          <text x="160" y="35" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">N</text>
-          <text x="285" y="170" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">E</text>
-          <text x="160" y="295" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">S</text>
-          <text x="35" y="170" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">W</text>
+          <text x="160" y="35" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">N</text>
+          <text x="285" y="170" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">E</text>
+          <text x="160" y="295" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">S</text>
+          <text x="35" y="170" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">W</text>
           
           {/* OBS selector triangle and course line - smooth rotation */}
           <motion.g
@@ -96,7 +97,7 @@ const VORInstrument: React.FC = () => {
               transformOrigin: '160px 160px'
             }}
             animate={{
-              rotate: displayRotation
+              rotate: visualRotation
             }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
           >
@@ -120,7 +121,7 @@ const VORInstrument: React.FC = () => {
         </svg>
       </div>
       
-      {/* CDI (Course Deviation Indicator) - Larger and more visible */}
+      {/* CDI (Course Deviation Indicator) - Scaled back up */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-4">
         <div className="relative w-32 h-4 bg-gray-800 border-2 border-gray-500 rounded">
           {/* CDI scale dots */}
@@ -148,8 +149,8 @@ const VORInstrument: React.FC = () => {
         </div>
       </div>
       
-      {/* TO/FROM flag - Better positioned */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-6">
+      {/* TO/FROM flag - Larger spacing */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-10">
         <div className={`
           px-2 py-1 rounded text-xs font-bold border min-w-[3rem] text-center
           ${vorReceiver.toFrom === 'TO' ? 'bg-green-600 text-white border-green-400' : 
@@ -160,12 +161,12 @@ const VORInstrument: React.FC = () => {
         </div>
       </div>
       
-      {/* Center hub */}
+      {/* Center hub - Larger */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div className="w-6 h-6 bg-gray-800 border-2 border-gray-600 rounded-full"></div>
       </div>
       
-      {/* OBS Control Knobs - Better positioned */}
+      {/* OBS Control Knobs - Larger */}
       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 items-center">
         <button
           onClick={() => handleOBSChange('left')}
@@ -186,7 +187,7 @@ const VORInstrument: React.FC = () => {
         </button>
       </div>
       
-      {/* Interactive OBS wheel overlay - Better scroll sensitivity */}
+      {/* Interactive OBS wheel overlay - Larger */}
       <div 
         className="absolute inset-4 cursor-grab active:cursor-grabbing rounded-full"
         onWheel={handleOBSWheel}

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useVORStore } from '../store/vorStore';
-import { Play, Pause, Plane, Gauge, Compass } from 'lucide-react';
+import { Play, Pause, Plane, Gauge, Compass, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, RotateCcw, RotateCw } from 'lucide-react';
 
 const AircraftControls: React.FC = () => {
   const { 
@@ -32,8 +32,6 @@ const AircraftControls: React.FC = () => {
     return () => clearInterval(interval);
   }, [aircraft.speed, simulation.isRunning, simulation.speed, moveAircraftForward]);
 
-
-
   const handleCircularHeadingClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -56,7 +54,44 @@ const AircraftControls: React.FC = () => {
     }
   };
 
+  const adjustHeading = (delta: number) => {
+    const newHeading = (aircraft.heading + delta + 360) % 360;
+    updateAircraftHeading(newHeading);
+  };
 
+  const adjustSpeed = (delta: number) => {
+    const newSpeed = Math.max(0, Math.min(300, aircraft.speed + delta));
+    setAircraftSpeed(newSpeed);
+  };
+
+  const handleManualMove = (direction: 'forward' | 'backward' | 'left' | 'right') => {
+    const moveDistance = 0.01; // Small movement in degrees
+    const headingRad = aircraft.heading * Math.PI / 180;
+    
+    let deltaLat = 0;
+    let deltaLng = 0;
+    
+    switch (direction) {
+      case 'forward':
+        deltaLat = moveDistance * Math.cos(headingRad);
+        deltaLng = moveDistance * Math.sin(headingRad);
+        break;
+      case 'backward':
+        deltaLat = -moveDistance * Math.cos(headingRad);
+        deltaLng = -moveDistance * Math.sin(headingRad);
+        break;
+      case 'left':
+        deltaLat = -moveDistance * Math.sin(headingRad);
+        deltaLng = moveDistance * Math.cos(headingRad);
+        break;
+      case 'right':
+        deltaLat = moveDistance * Math.sin(headingRad);
+        deltaLng = -moveDistance * Math.cos(headingRad);
+        break;
+    }
+    
+    updateAircraftPosition(aircraft.latitude + deltaLat, aircraft.longitude + deltaLng);
+  };
 
   const getCardinalDirection = (heading: number): string => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
@@ -82,48 +117,101 @@ const AircraftControls: React.FC = () => {
         </div>
       </div>
 
-      {/* Current Position & Heading */}
-      <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+      {/* Current Position & Heading - Horizontal Layout */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
         <div className="space-y-1">
-          <div className="text-gray-400">Position</div>
+          <div className="text-gray-400">Latitude</div>
           <div className="font-mono text-green-400">
-            {aircraft.latitude.toFixed(4)}°, {aircraft.longitude.toFixed(4)}°
+            {aircraft.latitude.toFixed(4)}°
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-gray-400">Longitude</div>
+          <div className="font-mono text-green-400">
+            {aircraft.longitude.toFixed(4)}°
           </div>
         </div>
         <div className="space-y-1">
           <div className="text-gray-400">Heading</div>
           <div className="font-mono text-green-400">
-            {aircraft.heading.toString().padStart(3, '0')}° ({getCardinalDirection(aircraft.heading)})
+            {aircraft.heading.toString().padStart(3, '0')}°
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-gray-400">Direction</div>
+          <div className="font-mono text-green-400">
+            {getCardinalDirection(aircraft.heading)}
           </div>
         </div>
       </div>
 
-      {/* Aircraft Control Section */}
-      <div className="mb-4 p-3 bg-gray-800/50 rounded">
-        <div className="flex items-center gap-2 mb-3">
-          <Compass size={16} className="text-blue-400" />
-          <span className="text-gray-400 text-sm font-medium">Aircraft Control</span>
-        </div>
+      {/* Main Controls - Horizontal Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         
-        <div className="grid grid-cols-2 gap-4">
-          {/* Circular Heading Control */}
+        {/* Manual Movement Controls */}
+        <div className="p-3 bg-gray-800/50 rounded">
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowUp size={16} className="text-blue-400" />
+            <span className="text-gray-400 text-sm font-medium">Move</span>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-1 max-w-24 mx-auto">
+            <div></div>
+            <button
+              onClick={() => handleManualMove('forward')}
+              className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+              title="Move forward"
+            >
+              <ArrowUp size={14} />
+            </button>
+            <div></div>
+            
+            <button
+              onClick={() => handleManualMove('left')}
+              className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+              title="Move left"
+            >
+              <ArrowLeft size={14} />
+            </button>
+            <button
+              onClick={() => handleManualMove('backward')}
+              className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+              title="Move backward"
+            >
+              <ArrowDown size={14} />
+            </button>
+            <button
+              onClick={() => handleManualMove('right')}
+              className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+              title="Move right"
+            >
+              <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Heading Control */}
+        <div className="p-3 bg-gray-800/50 rounded">
+          <div className="flex items-center gap-2 mb-3">
+            <Compass size={16} className="text-blue-400" />
+            <span className="text-gray-400 text-sm font-medium">Heading</span>
+          </div>
+          
           <div className="space-y-2">
-            <label className="text-xs text-gray-400 block">Heading (°)</label>
-            <div className="flex flex-col items-center gap-2">
-              {/* Circular heading control */}
+            {/* Circular compass - smaller */}
+            <div className="flex justify-center">
               <div className="relative">
                 <div 
-                  className="w-20 h-20 rounded-full border-2 border-gray-600 bg-gray-800 cursor-pointer hover:border-blue-400 transition-colors relative"
+                  className="w-16 h-16 rounded-full border-2 border-gray-600 bg-gray-800 cursor-pointer hover:border-blue-400 transition-colors relative"
                   onClick={handleCircularHeadingClick}
-                  title="Click to set heading direction"
+                  title="Click to set heading"
                 >
                   {/* Compass markings */}
                   <div className="absolute inset-0">
-                    {/* Cardinal directions */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-gray-400">N</div>
-                    <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-xs text-gray-400">E</div>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-xs text-gray-400">S</div>
-                    <div className="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-gray-400">W</div>
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">N</div>
+                    <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">E</div>
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 text-xs text-gray-400 font-bold">S</div>
+                    <div className="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">W</div>
                   </div>
                   
                   {/* Heading indicator */}
@@ -137,128 +225,188 @@ const AircraftControls: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            
+            {/* Turn buttons */}
+            <div className="flex items-center gap-1 justify-center">
+              <button
+                onClick={() => adjustHeading(-10)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+                title="Turn left 10°"
+              >
+                <RotateCcw size={12} />
+              </button>
+              <button
+                onClick={() => adjustHeading(-1)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+                title="Turn left 1°"
+              >
+                <RotateCcw size={10} />
+              </button>
               
-              {/* Heading input */}
               <input
                 type="number"
                 min="0"
                 max="359"
                 value={aircraft.heading}
                 onChange={(e) => handleHeadingInput(e.target.value)}
-                className="w-16 px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white text-center font-mono"
+                className="w-16 px-1 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white text-center font-mono"
                 placeholder="000"
               />
-              <div className="text-xs text-gray-500 text-center">
-                {getCardinalDirection(aircraft.heading)}
-              </div>
-            </div>
-          </div>
-
-          {/* Speed Control */}
-          <div className="space-y-2">
-            <label className="text-xs text-gray-400 block">Speed (kts)</label>
-            <input
-              type="number"
-              min="0"
-              max="300"
-              value={aircraft.speed}
-              onChange={(e) => setAircraftSpeed(parseInt(e.target.value) || 0)}
-              className="w-full px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white text-center font-mono"
-              placeholder="120"
-            />
-            <div className="text-xs text-gray-500 text-center">
-              Ground Speed
+              
+              <button
+                onClick={() => adjustHeading(1)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+                title="Turn right 1°"
+              >
+                <RotateCw size={10} />
+              </button>
+              <button
+                onClick={() => adjustHeading(10)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white"
+                title="Turn right 10°"
+              >
+                <RotateCw size={12} />
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-
-
-      {/* Flight Simulation Controls */}
-      <div className="mb-4 p-3 bg-gray-800/50 rounded">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <span className="text-gray-400 text-sm">Flight Simulation</span>
-            <div className="text-xs text-gray-500">Controls automatic flight</div>
+        {/* Speed Control */}
+        <div className="p-3 bg-gray-800/50 rounded">
+          <div className="flex items-center gap-2 mb-3">
+            <Gauge size={16} className="text-blue-400" />
+            <span className="text-gray-400 text-sm font-medium">Speed</span>
           </div>
-          <div className="flex items-center gap-2">
+          
+          <div className="space-y-2">
+            <div className="text-center">
+              <div className="text-lg font-mono text-green-400">
+                {aircraft.speed}
+              </div>
+              <div className="text-xs text-gray-500">
+                knots
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1 justify-center">
+              <button
+                onClick={() => adjustSpeed(-10)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white text-xs"
+                title="Decrease speed by 10 kts"
+              >
+                -10
+              </button>
+              <button
+                onClick={() => adjustSpeed(-1)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white text-xs"
+                title="Decrease speed by 1 kt"
+              >
+                -1
+              </button>
+              
+              <input
+                type="number"
+                min="0"
+                max="300"
+                value={aircraft.speed}
+                onChange={(e) => setAircraftSpeed(parseInt(e.target.value) || 0)}
+                className="w-16 px-1 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white text-center font-mono"
+                placeholder="120"
+              />
+              
+              <button
+                onClick={() => adjustSpeed(1)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white text-xs"
+                title="Increase speed by 1 kt"
+              >
+                +1
+              </button>
+              <button
+                onClick={() => adjustSpeed(10)}
+                className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-white text-xs"
+                title="Increase speed by 10 kts"
+              >
+                +10
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Auto Flight Control */}
+        <div className="p-3 bg-gray-800/50 rounded">
+          <div className="flex items-center gap-2 mb-3">
+            {simulation.isRunning ? <Pause size={16} className="text-red-400" /> : <Play size={16} className="text-green-400" />}
+            <span className="text-gray-400 text-sm font-medium">Auto Flight</span>
+          </div>
+          
+          <div className="space-y-2">
             <button
               onClick={simulation.isRunning ? stopSimulation : startSimulation}
-              className={`flex items-center gap-1 px-3 py-1 rounded text-xs transition-colors ${
+              className={`w-full flex items-center justify-center gap-1 px-2 py-2 rounded text-xs transition-colors ${
                 simulation.isRunning
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-green-600 text-white hover:bg-green-700'
               }`}
             >
               {simulation.isRunning ? <Pause size={12} /> : <Play size={12} />}
-              {simulation.isRunning ? 'Stop Flight' : 'Start Flight'}
+              {simulation.isRunning ? 'Stop' : 'Start'}
             </button>
+            
+            {simulation.isRunning && (
+              <>
+                <div className="text-center">
+                  <div className="text-sm font-mono text-green-400">
+                    {simulation.speed}x
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    time speed
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="100"
+                  step="0.1"
+                  value={simulation.speed}
+                  onChange={(e) => setSimulationSpeed(parseFloat(e.target.value))}
+                  className="w-full accent-blue-500"
+                />
+              </>
+            )}
           </div>
         </div>
-        
-        <div>
-          <label className="text-xs text-gray-400 block mb-1">Time Speed: {simulation.speed}x</label>
-          {/* Speed slider: 0.1x to 100x simulation speed */}
-          <input
-            type="range"
-            min="0.1"
-            max="100"
-            step="0.1"
-            value={simulation.speed}
-            onChange={(e) => setSimulationSpeed(parseFloat(e.target.value))}
-            className="w-full accent-blue-500"
-            disabled={!simulation.isRunning}
-          />
-          <div className="text-xs text-gray-500 mt-1 flex justify-between">
-            <span>0.1x</span>
-            <span>
-              {simulation.isRunning 
-                ? `Aircraft moving at ${simulation.speed}x speed`
-                : 'Start flight simulation to enable speed control'
-              }
-            </span>
-            <span>100x</span>
-          </div>
-        </div>
-        
-        {simulation.isRunning && (
-          <div className="mt-2 text-xs text-green-400 flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            Flying {getCardinalDirection(aircraft.heading)} at {aircraft.speed} kts (Time: {simulation.speed}x)
-          </div>
-        )}
       </div>
 
-      {/* Quick Position Presets */}
-      <div>
+      {/* Quick Position Presets - Horizontal */}
+      <div className="mt-4 pt-4 border-t border-gray-700">
         <div className="text-gray-400 text-sm mb-2">Quick Positions</div>
-        <div className="grid grid-cols-1 gap-1 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
           <button
             onClick={() => handleQuickPosition(33.9425, -118.4081, 90)}
             className="text-left p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded transition-colors"
           >
             <div className="font-medium text-white">LAX Area</div>
-            <div className="text-gray-400">33.9425°, -118.4081° (Heading 090°)</div>
+            <div className="text-gray-400">33.9425°, -118.4081°</div>
           </button>
           <button
             onClick={() => handleQuickPosition(32.7353, -117.1900, 180)}
             className="text-left p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded transition-colors"
           >
             <div className="font-medium text-white">San Diego</div>
-            <div className="text-gray-400">32.7353°, -117.1900° (Heading 180°)</div>
+            <div className="text-gray-400">32.7353°, -117.1900°</div>
           </button>
           <button
             onClick={() => handleQuickPosition(37.6213, -122.3790, 270)}
             className="text-left p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded transition-colors"
           >
             <div className="font-medium text-white">San Francisco</div>
-            <div className="text-gray-400">37.6213°, -122.3790° (Heading 270°)</div>
+            <div className="text-gray-400">37.6213°, -122.3790°</div>
           </button>
         </div>
       </div>
     </div>
   );
-};
+  };
 
 export default AircraftControls; 
