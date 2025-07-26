@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useVORStore } from '../store/vorStore';
-import { BookOpen, Target, MapPin, CheckCircle } from 'lucide-react';
+import { BookOpen, Target } from 'lucide-react';
 
 interface Scenario {
   id: string;

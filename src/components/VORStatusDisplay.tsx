@@ -1,6 +1,6 @@
 import React from 'react';
 import { useVORStore } from '../store/vorStore';
-import { Navigation, Radio, MapPin, Activity } from 'lucide-react';
+import { Radio, Activity } from 'lucide-react';
 
 const VORStatusDisplay: React.FC = () => {
   const { vorReceiver, aircraft } = useVORStore();
