@@ -71,9 +71,9 @@ Thumbs.db
 desktop.ini
 
 # Package manager files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# package-lock.json  # Keep this for reproducible builds
+yarn.lock  # Only if using npm (ignore yarn.lock)
+pnpm-lock.yaml  # Only if using npm (ignore pnpm-lock.yaml)
 .yarn/
 .pnp.*
 
