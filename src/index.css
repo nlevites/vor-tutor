@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .vor-instrument {
+    @apply relative bg-black rounded-full border-4 border-gray-800 shadow-xl;
+  }
+  
+  .vor-needle {
+    @apply absolute top-1/2 left-1/2 origin-bottom;
+    transform: translate(-50%, -100%);
+  }
+  
+  .aviation-panel {
+    @apply bg-gray-900 border border-gray-700 rounded-lg p-4 shadow-lg;
+  }
+  
+  .frequency-display {
+    @apply bg-green-900 text-green-400 font-mono text-xl px-3 py-1 rounded border border-green-700;
+  }
+  
+  .course-selector {
+    @apply bg-gray-800 border border-gray-600 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold;
+  }
+}
