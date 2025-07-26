@@ -118,7 +118,6 @@ const MapView: React.FC = () => {
   }, [aircraft.latitude, aircraft.longitude, mapCenter.lat, mapCenter.lng, manualPlacementMode]);
 
   const aircraftPos = projectPosition(aircraft.latitude, aircraft.longitude);
-  const selectedStation = stations.find(s => s.frequency === vorReceiver.frequency);
 
   // Calculate if recentering is happening
   const isRecentering = !manualPlacementMode && (
