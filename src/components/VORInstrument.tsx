@@ -115,14 +115,16 @@ const VORInstrument: React.FC = () => {
               x2="160" 
               y2="280"
               stroke="#ff4444"
-              strokeWidth="3"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+              style={{ shapeRendering: 'crispEdges' }}
             />
           </motion.g>
         </svg>
       </div>
       
       {/* CDI (Course Deviation Indicator) - Scaled back up */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-4">
+      <div className="absolute top-1/2 translate-y-4" style={{ left: '50%', transform: 'translateX(-50%)' }}>
         <div className="relative w-32 h-4 bg-gray-800 border-2 border-gray-500 rounded">
           {/* CDI scale dots */}
           {[-2, -1, 0, 1, 2].map((dot) => (
@@ -131,15 +133,21 @@ const VORInstrument: React.FC = () => {
               className={`absolute w-2 h-2 rounded-full top-1 ${
                 dot === 0 ? 'bg-white border border-gray-300' : 'bg-gray-400'
               }`}
-              style={{ left: `${50 + dot * 20}%`, transform: 'translateX(-50%)' }}
+              style={{ 
+                left: dot === 0 ? '50%' : `${50 + dot * 20}%`, 
+                transform: 'translateX(-50%)' 
+              }}
             />
           ))}
           
           {/* CDI needle */}
           <motion.div
-            className="absolute w-1 h-6 bg-yellow-400 border border-yellow-300 top-0 left-1/2 rounded-sm shadow-lg"
+            className="absolute h-6 bg-yellow-400 border border-yellow-300 top-0 rounded-sm shadow-lg"
             style={{ 
-              transform: `translateX(calc(-50% + ${cdiNeedlePosition}px))`,
+              width: '2px',
+              left: '50%',
+              marginLeft: '-1px',
+              transform: `translateX(${cdiNeedlePosition}px)`,
             }}
             animate={{ 
               x: cdiNeedlePosition 
