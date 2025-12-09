@@ -2,6 +2,8 @@
 
 A modern, interactive web application to help student pilots learn VOR (VHF Omnidirectional Range) navigation.
 
+https://github.com/nlevites/vor-tutor/issues/1#issue-3708601309
+
 ## Features
 
 - **Interactive VOR Instrument**: Realistic simulation of VOR receiver with OBS and CDI
