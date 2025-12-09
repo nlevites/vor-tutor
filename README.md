@@ -2,8 +2,8 @@
 
 A modern, interactive web application to help student pilots learn VOR (VHF Omnidirectional Range) navigation.
 
-https://github.com/nlevites/vor-tutor/issues/1#issue-3708601309
-
+[https://github.com/nlevites/vor-tutor/issues/1#issue-3708601309
+](https://private-user-images.githubusercontent.com/104597553/524019931-ffa6101e-b37a-44d6-aa7d-dc600087aa96.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjUyNDA4ODYsIm5iZiI6MTc2NTI0MDU4NiwicGF0aCI6Ii8xMDQ1OTc1NTMvNTI0MDE5OTMxLWZmYTYxMDFlLWIzN2EtNDRkNi1hYTdkLWRjNjAwMDg3YWE5Ni5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUxMjA5JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MTIwOVQwMDM2MjZaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kYWYyYjQxNGI2OGQzYTNmMzFjZjM4ZjM1NGJkODQ4ODQ4MGQzNGY1NzhiNzUwZjIwYmQ5ZDk1ZDg4M2IzYTY2JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.JWID9FLINngB2aO7t1IpL1_qHllNx0hI0j1DeNPChLM)
 ## Features
 
 - **Interactive VOR Instrument**: Realistic simulation of VOR receiver with OBS and CDI
